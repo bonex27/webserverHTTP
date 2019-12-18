@@ -78,6 +78,7 @@ public class JavaHTTPServer implements Runnable {
         BufferedOutputStream dataOut = null;
         String fileRequested = null;
         String method = null;
+        String originRequest = null;
 
         try {
             // we read characters from the client via input stream on the socket
@@ -91,7 +92,7 @@ public class JavaHTTPServer implements Runnable {
             String input = in.readLine();
             // we parse the request with a string tokenizer
             StringTokenizer parse = new StringTokenizer(input);
-             method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
+            method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
             // we get file requested
             fileRequested = parse.nextToken().toLowerCase();
 
@@ -122,6 +123,7 @@ public class JavaHTTPServer implements Runnable {
 
             } else {
                 // GET or HEAD method
+                originRequest = fileRequested;
                 if (fileRequested.endsWith("/")) {
                     fileRequested += DEFAULT_FILE;
                 }
@@ -141,7 +143,7 @@ public class JavaHTTPServer implements Runnable {
                     out.println("Content-length: " + fileLength);
                     out.println(); // blank line between headers and content, very important !
                     out.flush(); // flush character output stream buffer
-                    
+
                     dataOut.write(fileData, 0, fileLength);
                     dataOut.flush();
                 }
@@ -149,51 +151,83 @@ public class JavaHTTPServer implements Runnable {
                 if (verbose) {
                     System.out.println("File " + fileRequested + " of type " + content + " returned");
                 }
+                
 
             }
 
         } catch (FileNotFoundException fnfe) {
             try {
-                if (!fileRequested.endsWith("/")) {
-                    fileRequested += "/" +DEFAULT_FILE;
-                
-                try
-                {
-                File file = new File(WEB_ROOT, fileRequested);
-                int fileLength = (int) file.length();
-                String content = getContentType(fileRequested);
+                if (!originRequest.endsWith("/") ) {
+                    fileRequested += "/";
 
-                if (method.equals("GET")) { // GET method so we return content
-                    byte[] fileData = readFileData(file, fileLength);
+//                try
+//                {
+                    File file = new File(WEB_ROOT, fileRequested);
 
-                    // send HTTP Headers
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Server: Java HTTP Server from SSaurel : 1.0");
-                    out.println("Date: " + new Date());
-                    out.println("Content-type: " + content);
-                    out.println("Content-length: " + fileLength);
-                    out.println(); // blank line between headers and content, very important !
-                    out.flush(); // flush character output stream buffer
-                    File eRR301 = new File(WEB_ROOT, rEDIRECTED_FILE);
-                    fileLength = (int) file.length();
-                    fileData = readFileData(eRR301, fileLength);
-                    fileLength = (int) file.length();
-                    dataOut.write(fileData, 0, fileLength);
-                    dataOut.flush();
-                }
+                    int fileLength = (int) file.length();
+                    String content = getContentType(fileRequested);
 
-                if (verbose) {
-                    System.out.println("File " + fileRequested + " of type " + content + " returned");
-                }
-                }
-                catch(FileNotFoundException err)
-                {
-                    fileNotFound(out, dataOut, fileRequested,false);
-                }
-                }
+                    if (method.equals("GET")) { // GET method so we return content
+                        //byte[] fileData = readFileData(file, fileLength);
 
-            } catch (IOException ioe) 
-                    {
+                        // send HTTP Headers
+                        out.println("HTTP/1.1 301 Moved permanently");
+                        out.println("Server: Java HTTP Server from SSaurel : 1.0");
+                        out.println("Date: " + new Date());
+                        //out.println("Content-type: " + content);
+                        //out.println("Content-length: " + fileLength);
+                        out.println("Location:" + fileRequested);
+                        out.println(); // blank line between headers and content, very important !
+                        out.flush(); // flush character output stream buffer
+
+                        //File file301 = new File(WEB_ROOT, fileRequested);
+                        //dataOut.write(fileData, 0, fileLength);
+                        dataOut.flush();
+                        //}
+
+                        if (verbose) {
+                            System.out.println("File " + fileRequested + " of type " + content + " returned");
+                        }
+                    }
+//                catch(FileNotFoundException err)
+//                {
+//                    fileNotFound(out, dataOut, fileRequested,false);
+//                }
+                } else {
+                    try {
+                        fileRequested += DEFAULT_FILE;
+                        File file = new File(WEB_ROOT, originRequest);
+                        int fileLength = (int) file.length();
+                        String content = getContentType(fileRequested);
+
+                        if (method.equals("GET")) { // GET method so we return content
+                            byte[] fileData = readFileData(file, fileLength);
+
+                            // send HTTP Headers
+                            out.println("HTTP/1.1 200 OK");
+                            out.println("Server: Java HTTP Server from SSaurel : 1.0");
+                            out.println("Date: " + new Date());
+                            out.println("Content-type: " + content);
+                            out.println("Content-length: " + fileLength);
+                            out.println(); // blank line between headers and content, very important !
+                            out.flush(); // flush character output stream buffer
+
+                            dataOut.write(fileData, 0, fileLength);
+                            dataOut.flush();
+                        }
+
+                        if (verbose) {
+                            System.out.println("File " + fileRequested + " of type " + content + " returned");
+                        }
+                    
+
+                }
+                catch (FileNotFoundException a) {
+                fileNotFound(out, dataOut, fileRequested,false);
+                }
+            }
+
+            } catch (IOException ioe) {
                 System.err.println("Error with file not found exception : " + ioe.getMessage());
             }
 
@@ -241,7 +275,7 @@ public class JavaHTTPServer implements Runnable {
         }
     }
 
-    private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested,boolean recheck) throws IOException {
+    private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested, boolean recheck) throws IOException {
         if (recheck == false) {
             File file = new File(WEB_ROOT, FILE_NOT_FOUND);
             int fileLength = (int) file.length();
@@ -262,9 +296,8 @@ public class JavaHTTPServer implements Runnable {
             if (verbose) {
                 System.out.println("File " + fileRequested + " not found");
             }
-        }
-        else{
-             File file = new File(WEB_ROOT, Redirect);
+        } else {
+            File file = new File(WEB_ROOT, Redirect);
             int fileLength = (int) file.length();
             String content = "text/html";
             byte[] fileData = readFileData(file, fileLength);
