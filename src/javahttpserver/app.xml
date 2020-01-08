@@ -2,5 +2,6 @@
 <app>
    
         <porta>5002</porta>
+        <redirect>true</redirect>
 
 </app>

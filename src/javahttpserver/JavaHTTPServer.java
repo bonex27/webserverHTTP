@@ -38,6 +38,7 @@ public class JavaHTTPServer implements Runnable {
     static final String Redirect = "301.html";
     // port to listen connection
     static final int PORT = 8080;
+    static boolean redirect;
 
     // verbose mode
     static final boolean verbose = true;
@@ -54,6 +55,7 @@ public class JavaHTTPServer implements Runnable {
             AppConfigParser configParser = new AppConfigParser();
            App config = configParser.parse("javahttpserver/app.xml");
             ServerSocket serverConnect = new ServerSocket(config.getPorta());
+            redirect = config.getRedirect();
             //System.out.println("Server started.\nListening for connections on port : " + PORT + " ...\n");
 
             // we listen until user halts server execution
@@ -161,7 +163,7 @@ public class JavaHTTPServer implements Runnable {
 
         } catch (FileNotFoundException fnfe) {
             try {
-                if (!originRequest.endsWith("/") ) {
+                if (!originRequest.endsWith("/") && redirect) {
                     fileRequested += "/";
 
 //                try

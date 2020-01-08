@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class App {
     private  int porta;
+    private boolean redirect;
 
     public int getPorta() {
         return porta;
@@ -24,6 +25,14 @@ public class App {
         this.porta = porta;
     }
 
+    public boolean getRedirect() {
+        return redirect;
+    }
+
+    public void setRedirect(boolean redirect) {
+        this.redirect = redirect;
+    }
+    
     
   
 
