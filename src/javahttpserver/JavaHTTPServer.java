@@ -20,8 +20,10 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.StringTokenizer;
+import javax.xml.bind.JAXBException;
 
 // The tutorial can be found just here on the SSaurel's Blog : 
 // https://www.ssaurel.com/blog/create-a-simple-http-web-server-in-java
@@ -47,10 +49,12 @@ public class JavaHTTPServer implements Runnable {
         connect = c;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException, JAXBException {
         try {
-            ServerSocket serverConnect = new ServerSocket(PORT);
-            System.out.println("Server started.\nListening for connections on port : " + PORT + " ...\n");
+            AppConfigParser configParser = new AppConfigParser();
+           App config = configParser.parse("javahttpserver/app.xml");
+            ServerSocket serverConnect = new ServerSocket(config.getPorta());
+            //System.out.println("Server started.\nListening for connections on port : " + PORT + " ...\n");
 
             // we listen until user halts server execution
             while (true) {
