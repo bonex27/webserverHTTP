@@ -30,8 +30,8 @@ import javax.xml.bind.JAXBException;
 // Each Client Connection will be managed in a dedicated Thread
 public class JavaHTTPServer implements Runnable {
 
-    static final File WEB_ROOT = new File("./WebServer");
-    static final String DEFAULT_FILE = "index.html";
+    static final File WEB_ROOT = new File(".");
+    static final String DEFAULT_FILE = "Xml.xml";
     static final String rEDIRECTED_FILE = "301.html";
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not-supported.html";
@@ -53,9 +53,11 @@ public class JavaHTTPServer implements Runnable {
     public static void main(String[] args) throws URISyntaxException, JAXBException {
         try {
             AppConfigParser configParser = new AppConfigParser();
-           App config = configParser.parse("javahttpserver/app.xml");
+            App config = configParser.parse("javahttpserver/app.xml");
             ServerSocket serverConnect = new ServerSocket(config.getPorta());
             redirect = config.getRedirect();
+            AppFileFormat FF = new AppFileFormat();
+            FF.jaxbObjectToXML();
             //System.out.println("Server started.\nListening for connections on port : " + PORT + " ...\n");
 
             // we listen until user halts server execution
@@ -145,7 +147,10 @@ public class JavaHTTPServer implements Runnable {
                     out.println("HTTP/1.1 200 OK");
                     out.println("Server: Java HTTP Server from SSaurel : 1.0");
                     out.println("Date: " + new Date());
-                    out.println("Content-type: " + content);
+                    if(fileRequested.endsWith(".xml"))
+                        out.println("Content-type: " + "xml");
+                    else
+                        out.println("Content-type: " + content);
                     out.println("Content-length: " + fileLength);
                     out.println(); // blank line between headers and content, very important !
                     out.flush(); // flush character output stream buffer

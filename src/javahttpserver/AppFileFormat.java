@@ -5,6 +5,7 @@
  */
 package javahttpserver;
 
+import java.io.File;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -15,12 +16,24 @@ import javax.xml.bind.Marshaller;
  */
 public class AppFileFormat {
 
-    public AppFileFormat() throws JAXBException {
-        JAXBContext jaxbContext     = JAXBContext.newInstance(Man.class);
-        Marshaller jaxbMarshaller   = jaxbContext.createMarshaller();
-        Man employeeObj = new Man("Pietro","Bonechi",18);
-        
-        jaxbMarshaller.marshal(employeeObj);
+    Man m = new Man();
+    public AppFileFormat() {
+    }
+    public void jaxbObjectToXML() throws JAXBException
+    {
+        JAXBContext jaxbContext = JAXBContext.newInstance(Man.class);
+             
+            //Create Marshaller
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+ 
+            //Formatting file
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+ 
+           //Store XML to File
+            File file = new File("Xml.xml");
+             
+            //Writes XML file to file-system
+            jaxbMarshaller.marshal(m, file);
     }
 
  

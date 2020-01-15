@@ -5,43 +5,21 @@
  */
 package javahttpserver;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  *
  * @author informatica
  */
+@XmlRootElement
 public class Man {
-    String nome;
-    String cognome;
-    int eta;
-
-    public Man(String nome, String cognome, int eta) {
-        this.nome = nome;
-        this.cognome = cognome;
-        this.eta = eta;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCognome() {
-        return cognome;
-    }
-
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
-    }
-
-    public int getEta() {
-        return eta;
-    }
-
-    public void setEta(int eta) {
-        this.eta = eta;
-    }
-    
+    @XmlElement
+    private String nome = "Pietro";
+    @XmlElement
+    private String cognome ="Bonechi";
+    @XmlElement
+    private int eta =18; 
 }
